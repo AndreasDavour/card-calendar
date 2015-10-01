@@ -16,3 +16,21 @@
 ;;; figure out how many days into that card we are
 
 ;;; Leap years
+;;;
+
+(defun leap-yearp (year)
+  "Predicate checking true for leap years"
+  (cond
+    ((not (zerop (mod year 4)))
+     ; common year
+     nil)
+    ((not (zerop (mod year 100)))
+     ; leap year
+     t)
+    ((not (zerop (mod year 400)))
+     ; common year
+     nil)
+    (t
+     ; leap year
+     t)))
+
