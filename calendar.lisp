@@ -42,7 +42,7 @@
 			       ("December" . 31)))
 
 (defparameter months '("January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December"))
-
+(defparameter cards '(("spades" . "ace") ("spades" . "2")))
 
 ;;; worker functions
 
@@ -76,12 +76,45 @@ leap day if needed."
 matching the number of that week of the year, 
 and the day in that week. Date expected in YYYY-MM-DD
 format."
-  (let* ((result)
-	 (split-data (cl-ppcre:split "-" date))
+  (let* ((split-data (cl-ppcre:split "-" date))
 	 (year (first split-data))
 	 (month (second split-data))
 	 (day (third split-data)))
-;    (multiple-value-bind (year month day) (cl-ppcre:scan date)
-					;     (setf result nil))
     (sum-days-until-now day month year)))
 
+;; I've realized that I've been working from the assumption that
+;; 1st of January is the first day of the 1st week.
+;; In 2015 it's not true, as then it's a Thursday, and you can not
+;; work from the assumption it repeats every 7 years due to leap years.
+;; TODO: Keep working from the basic assumption and then correct with
+;;       an offset from another calculation.
+
+;; days per card
+(/ 365 52) -> 7.0192
+
+;; card order
+;; Spades, Diamonds, Clubs, Hearts
+;; ace, 2-10, jack, queen, king
+
+;;  a full deck of cards
+(loop :for i :in '(Spades Diamonds Clubs Hearts)
+      :do (loop :for p :from 1 :to 13
+					;		:do (format t "~A of ~A~%" p i)))
+		:do
+		   (cond ((equal p 1) (format t "~A of ~A~%" 'ace i))
+			 ((equal p 11) (format t "~A of ~A~%" 'jack i))
+			 ((equal p 12) (format t "~A of ~A~%" 'queen i))
+			 ((equal p 13) (format t "~A of ~A~%" 'king i))
+			 (t (format t "~A of ~A~%" p i))))
+	  (format t "~%"))
+
+(let ((deck))
+  (loop :for i :in '(spades diamonds clubs hearts)
+	:do (loop :for p :from 1 :to 13
+		  :do
+		     (cond ((equal p 1)  (push  (format nil "~A of ~A " 'ace i) deck))
+			   ((equal p 11) (push  (format nil "~A of ~A " 'jack i) deck))
+			   ((equal p 12) (push  (format nil "~A of ~A " 'queen i) deck))
+			   ((equal p 13) (push  (format nil "~A of ~A " 'king i) deck))
+			   (t (push  (format nil "~A of ~A " p i) deck)))))
+  (nreverse deck))
